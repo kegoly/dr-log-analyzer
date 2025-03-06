@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [0.1.19] - 2025-03-06
+
+### Changed
+- Bumped pulumi-datarobot version
+
+### Fixed
+- "Usecase already registered" error
+- Support is_separator_regex for vector databases
+
+### Added
+- Support for existing textgen deployments or registered models
+- Add token count and rouge guardrails
+- Add feedback mechanism for the DR Q&A App 
+
 ## [0.1.18] - 2025-01-18
 
 ### Added

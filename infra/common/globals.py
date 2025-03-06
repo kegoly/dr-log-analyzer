@@ -166,3 +166,11 @@ class GlobalLLM:
 
     # API Models
     DEPLOYED_LLM = LLMConfig(name="custom-model", credential_type="api")
+
+
+class GlobalApplicationTemplates(str, Enum):
+    FLASK_APP_BASE = "Flask App Base"
+    Q_AND_A_CHAT_GENERATION_APP = "Q&A Chat Generation App"
+    SLACK_BOT_APP = "Slack Bot App"
+    STREAMLIT_APP_BASE = "Streamlit App Base"
+    NODE_JS_AND_REACT_APP = "Node.js & React Base App"

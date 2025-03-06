@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import datarobot as dr
-import pulumi
 
 from docsassist.i18n import LanguageCode, LocaleSettings
 from infra.common.globals import GlobalRuntimeEnvironment
@@ -21,15 +21,20 @@ from infra.common.schema import ApplicationSourceArgs
 from infra.settings_main import PROJECT_ROOT, project_name
 
 
-def ensure_app_settings(app_id: str) -> None:
+def get_app_template_id(name: str) -> str:
+    client = dr.client.get_client()
     try:
-        dr.client.get_client().patch(
-            f"customApplications/{app_id}/",
-            json={"allowAutoStopping": True},
-            timeout=60,
+        templates = client.get(
+            "customTemplates/", params={"templateType": "customApplicationTemplate"}
+        ).json()
+        template_id: str = next(
+            template["id"] for template in templates["data"] if template["name"] == name
         )
-    except Exception:
-        pulumi.warn("Could not enable autostopping for the Application")
+        return template_id
+    except Exception as e:
+        raise ValueError(
+            f"Could not find the Application Template ID for {name}"
+        ) from e
 
 
 _application_path = PROJECT_ROOT / "frontend"

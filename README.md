@@ -115,9 +115,12 @@ Each template provides an end-to-end AI architecture, from raw inputs to deploye
 
 ### Change the LLM
 
-1. Modify the `LLM` setting in `infra/settings_generative.py` by changing `LLM=GlobalLLM.AZURE_OPENAI_GPT_4_O` to any other LLM from the `GlobalLLM` object.
-2. Provide the required credentials in `.env` dependent on your choice.
-3. Run `pulumi up` to update your stack (Or rerun your quickstart).
+1. Modify the `LLM` setting in `infra/settings_generative.py` by changing `LLM=GlobalLLM.AZURE_OPENAI_GPT_4_O_MINI` to any other LLM from the `GlobalLLM` object.
+2. To use an existing TextGen model or deployment, set either the `TEXTGEN_REGISTERED_MODEL_ID` or the `TEXTGEN_DEPLOYMENT_ID` in your `.env` file and change `LLM=GlobalLLM.DEPLOYED_LLM` in `infra/settings_generative.py`.
+   
+   In case we can't infer the prompt column name from your deployment, set it in `infra/settings_proxy_llm.py`. 
+3. If not using an existing TextGen model or deployment, provide the required credentials in `.env` dependent on your choice.
+4. Run `pulumi up` to update your stack (Or rerun your quickstart).
       ```bash
       source set_env.sh  # On windows use `set_env.bat`
       pulumi up

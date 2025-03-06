@@ -59,7 +59,7 @@ def test_guard_deployment_prediction(pulumi_up, make_prediction, rag_deployment_
 
 
 def test_toxicity_deployment_prediction(pulumi_up, make_prediction, rag_deployment_id):
-    from infra.settings_global_guardrails import toxicity
+    from infra.settings_global_model_guardrails import toxicity
 
     prompt_feature_name = PROMPT_COLUMN_NAME
 
@@ -78,7 +78,7 @@ def test_toxicity_deployment_prediction(pulumi_up, make_prediction, rag_deployme
 
 
 def test_injection_deployment_prediction(pulumi_up, make_prediction, rag_deployment_id):
-    from infra.settings_global_guardrails import prompt_injection
+    from infra.settings_global_model_guardrails import prompt_injection
 
     prompt_feature_name = PROMPT_COLUMN_NAME
 

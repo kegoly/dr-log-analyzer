@@ -61,7 +61,7 @@ with open(logo) as f:
 
 st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
-dr.Client(endpoint=DATAROBOT_ENDPOINT, token=DATAROBOT_API_KEY)  # type: ignore[attr-defined]
+dr.Client(endpoint=DATAROBOT_ENDPOINT, token=DATAROBOT_API_KEY)
 
 
 if "messages" not in st.session_state:

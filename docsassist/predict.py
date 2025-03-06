@@ -54,7 +54,7 @@ class DeploymentInfo:
 
 
 def _get_deployment_info(deployment_id: str) -> DeploymentInfo:
-    deployment = dr.Deployment.get(deployment_id)  # type: ignore[attr-defined]
+    deployment = dr.Deployment.get(deployment_id)
     target_name = deployment.model["target_name"]  # type: ignore[index]
     return DeploymentInfo(deployment, str(target_name))
 
