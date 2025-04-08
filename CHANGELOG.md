@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [0.1.20] - 2025-04-08
+
+### Added
+- Resource bundle config option for the custom model
+- Add support for NIM models and existing LLM deployments
+- Add chat endpoint to custom deployment
+
+### Changed
+
+- Installed [the datarobot-pulumi-utils library](https://github.com/datarobot-oss/datarobot-pulumi-utils) to incorporate majority of reused logic in the `infra.*` subpackages.
+
 ## [0.1.19] - 2025-03-06
 
 ### Changed

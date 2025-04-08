@@ -14,24 +14,14 @@
 
 # ruff: noqa: F401
 
-import textwrap
-
 import pulumi_datarobot as datarobot
-
-from docsassist.credentials import AzureOpenAICredentials
-from infra.common.globals import (
-    GlobalGuardrailTemplateName,
-    GlobalLLM,
-)
-from infra.common.schema import (
+from datarobot_pulumi_utils.schema.guardrails import (
     Condition,
     GuardConditionComparator,
+    GuardrailTemplateNames,
     ModerationAction,
     Stage,
 )
-
-from .components.dr_llm_credential import get_credentials
-from .settings_main import project_name
 
 prompt_tokens = datarobot.CustomModelGuardConfigurationArgs(
     name="Prompt Tokens",
@@ -61,7 +51,7 @@ response_tokens = datarobot.CustomModelGuardConfigurationArgs(
 
 rouge = datarobot.CustomModelGuardConfigurationArgs(
     name="ROUGE-1 Guard",
-    template_name=GlobalGuardrailTemplateName.ROUGE_1,
+    template_name=GuardrailTemplateNames.ROUGE_1,
     stages=[Stage.RESPONSE],
     intervention=datarobot.CustomModelGuardConfigurationInterventionArgs(
         action=ModerationAction.REPORT,
@@ -90,7 +80,7 @@ rouge = datarobot.CustomModelGuardConfigurationArgs(
 
 # stay_on_topic_guardrail = datarobot.CustomModelGuardConfigurationArgs(
 #     name=f"Stay on Topic Guard Configuration [{project_name}]",
-#     template_name=GlobalGuardrailTemplateName.STAY_ON_TOPIC_FOR_INPUTS,
+#     template_name=GuardrailTemplateNames.STAY_ON_TOPIC_FOR_INPUTS,
 #     openai_api_base=guardrail_credentials.azure_endpoint,
 #     openai_credential=guardrail_api_token_credential.id,
 #     openai_deployment_id=guardrail_credentials.azure_deployment,

@@ -11,23 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Optional
 
-from docsassist.schema import ApplicationType, CoreSettings, RAGType
-
-from .common.globals import (
-    GlobalPredictionEnvironmentPlatforms,
-    GlobalRuntimeEnvironment,
-)
-from .common.schema import (
+from datarobot_pulumi_utils.pulumi.stack import get_stack
+from datarobot_pulumi_utils.schema.common import UseCaseArgs
+from datarobot_pulumi_utils.schema.custom_models import (
     PredictionEnvironmentArgs,
-    UseCaseArgs,
+    PredictionEnvironmentPlatforms,
 )
-from .common.stack import get_stack
+from datarobot_pulumi_utils.schema.exec_envs import RuntimeEnvironments
+
+from docsassist.schema import ApplicationType, CoreSettings, RAGType
 
 project_name = get_stack()
 
@@ -42,13 +39,13 @@ core = CoreSettings(
     application_type=ApplicationType.DR,
 )
 
-runtime_environment_moderations = GlobalRuntimeEnvironment.PYTHON_311_MODERATIONS.value
+runtime_environment_moderations = RuntimeEnvironments.PYTHON_312_MODERATIONS.value
 
 default_prediction_server_id: Optional[str] = None
 
 prediction_environment_args = PredictionEnvironmentArgs(
     resource_name=f"Guarded RAG Prediction Environment [{project_name}]",
-    platform=GlobalPredictionEnvironmentPlatforms.DATAROBOT_SERVERLESS,
+    platform=PredictionEnvironmentPlatforms.DATAROBOT_SERVERLESS,
 ).model_dump(mode="json", exclude_none=True)
 
 use_case_args = UseCaseArgs(

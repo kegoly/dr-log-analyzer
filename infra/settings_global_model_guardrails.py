@@ -11,31 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import pulumi_datarobot as datarobot
-from pydantic import BaseModel
-
-from docsassist.i18n import gettext
-
-from .common.globals import (
-    GlobalGuardrailTemplateName,
-    GlobalRegisteredModelName,
-)
-from .common.schema import (
+from datarobot_pulumi_utils.schema.custom_models import DeploymentArgs
+from datarobot_pulumi_utils.schema.guardrails import (
     Condition,
     CustomModelGuardConfigurationArgs,
-    DeploymentArgs,
     GuardConditionComparator,
+    GuardrailModelNames,
+    GuardrailTemplateNames,
     Intervention,
     ModerationAction,
     Stage,
 )
+from pydantic import BaseModel
+
+from docsassist.i18n import gettext
+
 from .settings_main import default_prediction_server_id, project_name
 
 
 class GlobalGuardrail(BaseModel):
     deployment_args: DeploymentArgs
-    registered_model_name: GlobalRegisteredModelName
+    registered_model_name: GuardrailModelNames
     custom_model_guard_configuration_args: CustomModelGuardConfigurationArgs
 
 
@@ -51,10 +48,10 @@ toxicity = GlobalGuardrail(
             )
         ),
     ),
-    registered_model_name=GlobalRegisteredModelName.TOXICITY,
+    registered_model_name=GuardrailModelNames.TOXICITY,
     custom_model_guard_configuration_args=CustomModelGuardConfigurationArgs(
         name=f"Toxicity Guard Configuration [{project_name}]",
-        template_name=GlobalGuardrailTemplateName.TOXICITY,
+        template_name=GuardrailTemplateNames.TOXICITY,
         stages=[Stage.PROMPT],
         intervention=Intervention(
             action=ModerationAction.BLOCK,
@@ -81,10 +78,10 @@ prompt_injection = GlobalGuardrail(
             )
         ),
     ),
-    registered_model_name=GlobalRegisteredModelName.PROMPT_INJECTION,
+    registered_model_name=GuardrailModelNames.PROMPT_INJECTION,
     custom_model_guard_configuration_args=CustomModelGuardConfigurationArgs(
         name=f"Prompt Injection Guard Configuration [{project_name}]",
-        template_name=GlobalGuardrailTemplateName.PROMPT_INJECTION,
+        template_name=GuardrailTemplateNames.PROMPT_INJECTION,
         stages=[Stage.PROMPT],
         intervention=Intervention(
             action=ModerationAction.BLOCK,

@@ -13,27 +13,29 @@
 # limitations under the License.
 from __future__ import annotations
 
+import os
+
 import datarobot as dr
 import pulumi
 import pulumi_datarobot as datarobot
-
-from docsassist.schema import TARGET_COLUMN_NAME
-
-from .common.schema import (
+from datarobot_pulumi_utils.schema.custom_models import (
     CustomModelArgs,
     DeploymentArgs,
     RegisteredModelArgs,
 )
+
+from docsassist.schema import TARGET_COLUMN_NAME
+
 from .settings_main import (
     default_prediction_server_id,
     project_name,
     runtime_environment_moderations,
 )
 
-# Override prompt column name here in case it's different from the default and prompt column has not been set on the deployment
-TEXTGEN_DEPLOYMENT_PROMPT_COLUMN_NAME = None
+CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 custom_model_args = CustomModelArgs(
+    name=f"Guarded RAG Proxy LLM Custom Model [{project_name}]",
     resource_name=f"Guarded RAG Proxy LLM Custom Model [{project_name}]",
     base_environment_id=runtime_environment_moderations.id,
     target_name=TARGET_COLUMN_NAME,

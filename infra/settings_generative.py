@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from __future__ import annotations
 
 import pathlib
@@ -20,33 +19,37 @@ import textwrap
 import datarobot as dr
 import pulumi
 import pulumi_datarobot as datarobot
+from datarobot_pulumi_utils.schema.custom_models import (
+    CustomModelArgs,
+    CustomModelResourceBundles,
+    DeploymentArgs,
+    RegisteredModelArgs,
+)
+from datarobot_pulumi_utils.schema.datasets import DatasetArgs
+from datarobot_pulumi_utils.schema.llms import (
+    LLMBlueprintArgs,
+    LLMs,
+    PlaygroundArgs,
+)
+from datarobot_pulumi_utils.schema.vectordb import (
+    ChunkingParameters,
+    VectorDatabaseArgs,
+)
 from jinja2 import BaseLoader, Environment
 from pydantic import BaseModel
 
 from docsassist.i18n import gettext
 from docsassist.schema import TARGET_COLUMN_NAME, RAGModelSettings, RAGType
-from infra.common.globals import GlobalLLM
 
-from .common.schema import (
-    ChunkingParameters,
-    CustomModelArgs,
-    DatasetArgs,
-    DeploymentArgs,
-    LLMBlueprintArgs,
-    LLMSettings,
-    PlaygroundArgs,
-    RegisteredModelArgs,
-    VectorDatabaseArgs,
-    VectorDatabaseSettings,
-)
 from .settings_main import (
     PROJECT_ROOT,
     core,
     default_prediction_server_id,
     project_name,
+    runtime_environment_moderations,
 )
 
-LLM = GlobalLLM.AZURE_OPENAI_GPT_4_O_MINI
+LLM = LLMs.AZURE_OPENAI_GPT_4_O_MINI
 
 
 custom_model_args = CustomModelArgs(
@@ -54,13 +57,14 @@ custom_model_args = CustomModelArgs(
     name="Guarded RAG Assistant",  # built-in QA app uses this as the AI's name
     target_name=TARGET_COLUMN_NAME,
     target_type=dr.enums.TARGET_TYPE.TEXT_GENERATION,
+    resource_bundle_id=CustomModelResourceBundles.CPU_M.value.id,
+    base_environment_id=runtime_environment_moderations.id,
     opts=pulumi.ResourceOptions(delete_before_replace=True),
 )
 
 registered_model_args = RegisteredModelArgs(
     resource_name=f"Guarded RAG Registered Model [{project_name}]",
 )
-
 
 deployment_args = DeploymentArgs(
     resource_name=f"Guarded RAG Deployment [{project_name}]",
@@ -101,7 +105,7 @@ if core.rag_type == RAGType.DR:
     )
 
     system_prompt = """\
-                You are a helpful assistant, helping users answer questions about some document(s). 
+                You are a helpful assistant, helping users answer questions about some document(s).
 
                 You will be given extracts from the document(s) to help answer the question.
 
@@ -111,11 +115,11 @@ if core.rag_type == RAGType.DR:
     llm_blueprint_args = LLMBlueprintArgs(
         resource_name=f"Guarded RAG LLM Blueprint [{project_name}]",
         llm_id=LLM.name,
-        llm_settings=LLMSettings(
+        llm_settings=datarobot.LlmBlueprintLlmSettingsArgs(
             max_completion_length=512,
             system_prompt=textwrap.dedent(gettext(system_prompt)),
         ),
-        vector_database_settings=VectorDatabaseSettings(
+        vector_database_settings=datarobot.LlmBlueprintVectorDatabaseSettingsArgs(
             max_documents_retrieved_per_prompt=10,
             max_tokens=512,
         ),

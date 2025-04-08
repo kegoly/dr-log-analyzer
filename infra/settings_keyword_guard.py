@@ -11,27 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import json
 import textwrap
 
 import datarobot as dr
 import pulumi_datarobot as datarobot
+from datarobot_pulumi_utils.schema.custom_models import (
+    CustomModelArgs,
+    DeploymentArgs,
+    RegisteredModelArgs,
+)
+from datarobot_pulumi_utils.schema.guardrails import (
+    Condition,
+    CustomModelGuardConfigurationArgs,
+    GuardConditionComparator,
+    GuardrailTemplateNames,
+    Intervention,
+    ModerationAction,
+    Stage,
+)
 
 from docsassist.i18n import gettext
 
-from .common.globals import GlobalGuardrailTemplateName
-from .common.schema import (
-    Condition,
-    CustomModelArgs,
-    CustomModelGuardConfigurationArgs,
-    DeploymentArgs,
-    GuardConditionComparator,
-    Intervention,
-    ModerationAction,
-    RegisteredModelArgs,
-    Stage,
-)
 from .settings_main import (
     PROJECT_ROOT,
     default_prediction_server_id,
@@ -44,6 +45,7 @@ keyword_guard_positive_class_label = "true"
 keyword_guard_negative_class_label = "false"
 
 custom_model_args = CustomModelArgs(
+    name=f"Keyword Guard Custom Model [{project_name}]",
     resource_name=f"Keyword Guard Custom Model [{project_name}]",
     description="This model is designed to guard against questions about competitors",
     base_environment_id=runtime_environment_moderations.id,
@@ -92,7 +94,7 @@ deployment_args = DeploymentArgs(
 )
 
 custom_model_guard_configuration_args = CustomModelGuardConfigurationArgs(
-    template_name=GlobalGuardrailTemplateName.CUSTOM_DEPLOYMENT,
+    template_name=GuardrailTemplateNames.CUSTOM_DEPLOYMENT,
     name=f"Keyword Guard Configuration [{project_name}]",
     stages=[Stage.PROMPT],
     intervention=Intervention(
