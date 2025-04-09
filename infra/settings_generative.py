@@ -29,11 +29,13 @@ from datarobot_pulumi_utils.schema.datasets import DatasetArgs
 from datarobot_pulumi_utils.schema.llms import (
     LLMBlueprintArgs,
     LLMs,
+    LLMSettings,
     PlaygroundArgs,
 )
 from datarobot_pulumi_utils.schema.vectordb import (
     ChunkingParameters,
     VectorDatabaseArgs,
+    VectorDatabaseSettings,
 )
 from jinja2 import BaseLoader, Environment
 from pydantic import BaseModel
@@ -115,11 +117,11 @@ if core.rag_type == RAGType.DR:
     llm_blueprint_args = LLMBlueprintArgs(
         resource_name=f"Guarded RAG LLM Blueprint [{project_name}]",
         llm_id=LLM.name,
-        llm_settings=datarobot.LlmBlueprintLlmSettingsArgs(
+        llm_settings=LLMSettings(
             max_completion_length=512,
             system_prompt=textwrap.dedent(gettext(system_prompt)),
         ),
-        vector_database_settings=datarobot.LlmBlueprintVectorDatabaseSettingsArgs(
+        vector_database_settings=VectorDatabaseSettings(
             max_documents_retrieved_per_prompt=10,
             max_tokens=512,
         ),

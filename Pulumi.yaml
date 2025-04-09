@@ -1,3 +1,4 @@
+---
 name: guarded-rag-assistant
 runtime:
   name: python

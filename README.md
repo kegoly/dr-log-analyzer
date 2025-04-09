@@ -35,7 +35,7 @@ In addition to creating a hosted, shareable user interface, the guarded RAG assi
 
 ## Setup
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > If you are running this template in a DataRobot codespace, `pulumi` is already configured and the repo is automatically cloned;
 > skip to **Step 3**.
 1. If `pulumi` is not already installed, install the CLI following instructions [here](https://www.pulumi.com/docs/iac/download-install/). 
@@ -194,7 +194,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 source set_env.sh
 pulumi stack init YOUR_PROJECT_NAME
-pulumi up 
+pulumi up
 ```
 e.g. for Windows/conda/cmd.exe this would be:
 ```bash
@@ -203,7 +203,7 @@ conda activate .\.venv
 pip install -r requirements.txt
 set_env.bat
 pulumi stack init YOUR_PROJECT_NAME
-pulumi up 
+pulumi up
 ```
 For projects that will be maintained, DataRobot recommends forking the repo so upstream fixes and improvements can be merged in the future.
 
