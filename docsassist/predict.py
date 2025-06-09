@@ -67,7 +67,7 @@ def get_rag_completion(
 
     rag_output = RAGOutput(
         completion=str(response.choices[0].message.content),
-        references=response.citations,  # type: ignore[attr-defined]
+        references=response.citations or [],  # type: ignore[attr-defined]
         question=question,
     )
 

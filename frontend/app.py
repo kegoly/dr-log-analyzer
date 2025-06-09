@@ -18,6 +18,7 @@ import base64
 import logging
 import os
 import sys
+from io import StringIO
 
 import datarobot as dr
 import streamlit as st
@@ -70,6 +71,9 @@ if "messages" not in st.session_state:
 if "response" not in st.session_state:
     st.session_state.response = {}
 
+if "uploaded_files" not in st.session_state:
+    st.session_state.uploaded_files = []
+
 
 def render_svg(svg: str) -> None:
     """Renders the given svg string."""
@@ -78,22 +82,71 @@ def render_svg(svg: str) -> None:
     st.write(html, unsafe_allow_html=True)
 
 
+def process_uploaded_file(uploaded_file) -> str:
+    """Process uploaded file and return its content as string."""
+    try:
+        if uploaded_file.type == "text/plain":
+            # Read text file
+            stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+            content = stringio.read()
+        elif uploaded_file.type in ["text/csv", "application/csv"]:
+            # Read CSV file
+            stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+            content = stringio.read()
+        else:
+            # For other file types, try to read as text
+            content = uploaded_file.getvalue().decode("utf-8")
+        
+        return f"📎 {uploaded_file.name}:\n{content}"
+    except Exception as e:
+        return f"📎 {uploaded_file.name}: Failed to read file. Error: {str(e)}"
+
+
 def render_message(
     container: DeltaGenerator, message: str, is_user: bool = False
 ) -> None:
     message_role = "user" if is_user else "ai"
     message_label = gettext("User") if is_user else gettext("Assistant")
-    container.markdown(
-        f"""
-    <div class="chat-message {message_role}-message">
-        <div class="message-content">
-            <span class="message-label"><b>{message_label}:</b></span>
-            <span class="message-text">{message}</span>
+    
+    # Handle file attachments in message
+    if is_user and "📎" in message:
+        # Split message into parts if it contains file content
+        parts = message.split("📎")
+        user_text = parts[0].strip() if parts[0].strip() else "File attached"
+        
+        container.markdown(
+            f"""
+        <div class="chat-message {message_role}-message">
+            <div class="message-content">
+                <span class="message-label"><b>{message_label}:</b></span>
+                <span class="message-text">{user_text}</span>
+            </div>
         </div>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
+        """,
+            unsafe_allow_html=True,
+        )
+        
+        # Show file contents in expandable sections
+        for i, part in enumerate(parts[1:], 1):
+            if part.strip():
+                lines = part.strip().split('\n')
+                filename = lines[0].split(':')[0] if ':' in lines[0] else f"File {i}"
+                content = '\n'.join(lines[1:]) if len(lines) > 1 else "Unable to read content"
+                
+                with container.expander(f"📎 {filename}"):
+                    st.text(content)
+    else:
+        container.markdown(
+            f"""
+        <div class="chat-message {message_role}-message">
+            <div class="message-content">
+                <span class="message-label"><b>{message_label}:</b></span>
+                <span class="message-text">{message}</span>
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
 
 def render_conversation_history(container: DeltaGenerator) -> None:
@@ -121,6 +174,37 @@ def main() -> None:
     render_svg(svg)
     st.title(app_settings.page_title)
 
+    # File upload section
+    uploaded_files = st.file_uploader(
+        "📎 Select files to upload",
+        accept_multiple_files=True,
+        type=['txt', 'csv', 'log', 'json', 'md'],
+        help="You can upload text files, CSV, log files, and other supported formats"
+    )
+    
+    # Process uploaded files
+    file_contents = []
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            content = process_uploaded_file(uploaded_file)
+            file_contents.append(content)
+        
+        # Show uploaded files preview
+        if file_contents:
+            with st.expander(f"📎 Uploaded files ({len(file_contents)} file(s))"):
+                for content in file_contents:
+                    lines = content.split('\n')
+                    filename = lines[0].replace('📎 ', '').split(':')[0]
+                    st.write(f"**{filename}**")
+                    # Show first few lines as preview
+                    preview_lines = lines[1:4] if len(lines) > 1 else ["No content"]
+                    for line in preview_lines:
+                        if line.strip():
+                            st.text(line[:100] + "..." if len(line) > 100 else line)
+                    if len(lines) > 4:
+                        st.text("...")
+                    st.divider()
+
     chat_container = st.container()
     prompt_container = st.container()
     if st.session_state.messages:
@@ -140,16 +224,22 @@ def main() -> None:
 
     if prompt and prompt.strip():
         st.session_state.prompt_sent = True
-        render_message(chat_container, prompt, True)
+        
+        # Combine prompt with file contents if files are uploaded
+        full_message = prompt
+        if file_contents:
+            full_message = f"{prompt}\n\n" + "\n\n".join(file_contents)
+        
+        render_message(chat_container, full_message, True)
         with st.spinner(gettext("Getting AI response...")):
             response = predict.get_rag_completion(
-                question=prompt,
+                question=full_message,
                 messages=st.session_state.messages,
             )
         st.session_state.response = response
         st.session_state.messages.extend(
             [
-                ChatCompletionUserMessageParam(content=prompt, role="user"),
+                ChatCompletionUserMessageParam(content=full_message, role="user"),
                 ChatCompletionAssistantMessageParam(
                     content=response.completion, role="assistant"
                 ),
