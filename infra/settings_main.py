@@ -22,24 +22,14 @@ from datarobot_pulumi_utils.schema.custom_models import (
     PredictionEnvironmentArgs,
     PredictionEnvironmentPlatforms,
 )
-from datarobot_pulumi_utils.schema.exec_envs import RuntimeEnvironments
 
-from docsassist.schema import ApplicationType, CoreSettings, RAGType
+from infra.common.globals import GlobalRuntimeEnvironment
 
 project_name = get_stack()
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.absolute()
 
-# Core settings are overridable by environment variables; env values take precedence
-core = CoreSettings(
-    rag_documents=str(
-        PROJECT_ROOT / "assets" / "datarobot_english_documentation_docsassist.zip"
-    ),
-    rag_type=RAGType.DR,
-    application_type=ApplicationType.DR,
-)
-
-runtime_environment_moderations = RuntimeEnvironments.PYTHON_312_MODERATIONS.value
+runtime_environment_moderations = GlobalRuntimeEnvironment.PYTHON_312_MODERATIONS.value
 
 default_prediction_server_id: Optional[str] = None
 

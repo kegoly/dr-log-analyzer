@@ -35,9 +35,6 @@ from streamlit_theme import st_theme
 sys.path.append("../")
 from docsassist import predict
 from docsassist.i18n import gettext
-from docsassist.schema import (
-    RAGOutput,
-)
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
@@ -149,25 +146,25 @@ def render_message(
         )
 
 
+def render_answer_and_citations(
+    container: DeltaGenerator, response: dict
+) -> None:
+    """Render the AI response."""
+    try:
+        # Extract completion from API response
+        completion = response["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, TypeError):
+        completion = str(response)
+    
+    # Render the AI response
+    render_message(container, completion, is_user=False)
+
+
 def render_conversation_history(container: DeltaGenerator) -> None:
     container.subheader(gettext("Conversation History"))
     for message in st.session_state.messages[:-1]:  # Exclude the latest message
         render_message(container, message["content"], message["role"] == "user")
     st.markdown("---")
-
-
-def render_answer_and_citations(container: DeltaGenerator, response: RAGOutput) -> None:
-    render_message(container, response.completion, is_user=False)
-
-    with st.expander(gettext("Show Citations")):
-        for i, doc in enumerate(response.references):
-            st.markdown(gettext("**Reference {0}:**").format(i + 1))
-            st.markdown(gettext("**Source:** {0}").format(doc.metadata["source"]))
-            st.markdown(gettext("**Content:**"))
-            for text in doc.content.split("\\n"):
-                if text.strip():
-                    st.markdown(text)
-            st.markdown("---")
 
 
 def main() -> None:
@@ -237,11 +234,18 @@ def main() -> None:
                 messages=st.session_state.messages,
             )
         st.session_state.response = response
+        
+        # Extract completion content from response
+        try:
+            completion_content = response["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError):
+            completion_content = str(response)
+            
         st.session_state.messages.extend(
             [
                 ChatCompletionUserMessageParam(content=full_message, role="user"),
                 ChatCompletionAssistantMessageParam(
-                    content=response.completion, role="assistant"
+                    content=completion_content, role="assistant"
                 ),
             ]
         )

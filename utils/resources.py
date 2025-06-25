@@ -12,23 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import annotations
+"""Resource names and environment variable definitions."""
 
-from typing import Any, Dict
-
-from pydantic import BaseModel
-
-
-PROMPT_COLUMN_NAME: str = "promptText"
-TARGET_COLUMN_NAME: str = "resultText"
-
-
-class Reference(BaseModel):
-    content: str
-    link: str | None = None
-    metadata: dict[str, Any]
-
-
-class DocumentModel(BaseModel):
-    page_content: str
-    metadata: Dict[str, Any] = {}
+app_env_name: str = "DATAROBOT_APPLICATION_ID"
+llm_deployment_env_name: str = "LLM_DEPLOYMENT_ID"

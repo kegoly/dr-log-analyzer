@@ -13,62 +13,67 @@
 # limitations under the License.
 
 import logging
-from dataclasses import dataclass
+import requests
+import json
 
 import datarobot as dr
-from datarobot.models.deployment.deployment import Deployment
-from openai import OpenAI
+import streamlit as st
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
-from openai.types.chat.chat_completion_user_message_param import (
-    ChatCompletionUserMessageParam,
-)
-from pydantic import ValidationError
 
-from docsassist.deployments import RAGDeployment  # noqa: E402
-from docsassist.schema import (  # noqa: E402
-    RAGOutput,
-)
+from docsassist.deployments import LLMDeployment
 
 logger = logging.getLogger(__name__)
 
-try:
-    rag_deployment_id = RAGDeployment().id
-except ValidationError as e:
-    raise ValueError(
-        (
-            "Unable to load DataRobot deployment ids. If running locally, verify you have selected "
-            "the correct stack and that it is active using `pulumi stack output`. "
-            "If running in DataRobot, verify your runtime parameters have been set correctly."
-        )
-    ) from e
 
+def get_rag_completion(question: str, messages: list[ChatCompletionMessageParam]) -> dict:
+    """
+    Send a prompt to the DataRobot Chat API and return the response
+    
+    Args:
+        question (str): The user's question
+        messages (list): Previous conversation messages
+        
+    Returns:
+        dict: Response from the DataRobot Chat API
+    """
+    # Combine previous messages with the new question
+    all_messages = []
+    for msg in messages:
+        all_messages.append({"role": msg["role"], "content": msg["content"]})
+    
+    all_messages.append({"role": "user", "content": question})
+    
+    # Request data for chat completions API
+    data = {
+        "model": "deployed-llm",
+        "messages": all_messages
+    }
 
-@dataclass
-class DeploymentInfo:
-    deployment: Deployment
-    target_name: str
+    try:
+        deployment_id = LLMDeployment().id
+    except Exception as e:
+        st.error(f"Failed to retrieve deployment ID: {str(e)}")
+        raise
 
+    try:
+        client = dr.Client()
+        base_url = client.endpoint
+        
+        # Retrieve deployment information
+        url = f"{base_url}/deployments/{deployment_id}/chat/completions"
+        # Request headers
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {client.token}"
+        }
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        
+        if response.status_code != 200:
+            raise Exception(
+                f"DataRobot API Error: {response.status_code} - {response.text}")
+        
+        return response.json()
 
-def get_rag_completion(
-    question: str, messages: list[ChatCompletionMessageParam]
-) -> RAGOutput:
-    """Retrieve predictions from a DataRobot RAG deployment and DataRobot guard deployment"""
-    dr_client = dr.client.get_client()
-    openai_client = OpenAI(
-        base_url=dr_client.endpoint + f"/deployments/{rag_deployment_id}",
-        api_key=dr_client.token,
-    )
-
-    response = openai_client.chat.completions.create(
-        model="datarobot-deployed-llm",
-        messages=messages
-        + [ChatCompletionUserMessageParam(content=question, role="user")],
-    )
-
-    rag_output = RAGOutput(
-        completion=str(response.choices[0].message.content),
-        references=response.citations or [],  # type: ignore[attr-defined]
-        question=question,
-    )
-
-    return rag_output
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        raise

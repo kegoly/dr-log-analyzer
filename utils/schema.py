@@ -12,23 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import annotations
-
-from typing import Any, Dict
+"""Schema definitions for the Log Analyzer application."""
 
 from pydantic import BaseModel
 
 
-PROMPT_COLUMN_NAME: str = "promptText"
-TARGET_COLUMN_NAME: str = "resultText"
+class AppInfra(BaseModel):
+    """Application infrastructure configuration."""
+    database: str
+    llm: str
 
 
-class Reference(BaseModel):
-    content: str
-    link: str | None = None
-    metadata: dict[str, Any]
-
-
-class DocumentModel(BaseModel):
-    page_content: str
-    metadata: Dict[str, Any] = {}
+class LLMDeploymentSettings(BaseModel):
+    """LLM deployment settings."""
+    deployment_id: str
