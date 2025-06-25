@@ -20,5 +20,5 @@ class AppSettings(BaseModel):
 
 
 app_settings = AppSettings(
-    page_title="Guarded RAG Assistant",
+    page_title="Log Analyzer Assistant",
 )

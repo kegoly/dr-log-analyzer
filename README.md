@@ -1,11 +1,10 @@
-# Guarded RAG Assistant
+# Log Analyzer Assistant
 
-The guarded RAG assistant is an easily customizable recipe for building a RAG-powered chatbot. 
+The log analyzer assistant is an easily customizable recipe for building a chat-powered assistant for analyzing logs and documents. 
 
-In addition to creating a hosted, shareable user interface, the guarded RAG assistant provides:
+In addition to creating a hosted, shareable user interface, the log analyzer assistant provides:
 
 * Business logic and LLM-based guardrails.
-* A predictive secondary model that evaluates response quality.
 * GenAI-focused [custom metrics][custom-metrics].
 * DataRobot MLOps hosting, monitoring, and governing the individual back-end deployments.
 
@@ -13,7 +12,7 @@ In addition to creating a hosted, shareable user interface, the guarded RAG assi
 > Application templates are intended to be starting points that provide guidance on how to develop, serve, and maintain AI applications.
 > They require a developer or data scientist to adapt and modify them for their business requirements before being put into production.
 
-![Using the Guarded RAG Assistant](https://s3.amazonaws.com/datarobot_public/drx/recipe_gifs/launch_gifs/guardedraghq-small.gif)
+![Using the Log Analyzer Assistant](https://s3.amazonaws.com/datarobot_public/drx/recipe_gifs/launch_gifs/log-analyzer-small.gif)
 
 [custom-metrics]: https://docs.datarobot.com/en/docs/workbench/nxt-console/nxt-monitoring/nxt-custom-metrics.html
 
@@ -21,16 +20,13 @@ In addition to creating a hosted, shareable user interface, the guarded RAG assi
 1. [Setup](#setup)
 2. [Architecture overview](#architecture-overview)
 3. [Why build AI Apps with DataRobot app templates?](#why-build-ai-apps-with-datarobot-app-templates)
-4. [Make changes](#make-changes)
-   - [Change the RAG documents](#change-the-rag-documents)
+3. [Make changes](#make-changes)
    - [Change the LLM](#change-the-llm)
-   - [Change the RAG prompt](#change-the-RAG-prompt)
    - [Custom front-end](#fully-custom-front-end)
-   - [Custom RAG logic](#fully-custom-rag-chunking-vectorization-and-retrieval)
-5. [Share results](#share-results)
-6. [Delete all provisioned resources](#delete-all-provisioned-resources)
-7. [Setup for advanced users](#setup-for-advanced-users)
-8. [Data Privacy](#data-privacy)
+4. [Share results](#share-results)
+5. [Delete all provisioned resources](#delete-all-provisioned-resources)
+6. [Setup for advanced users](#setup-for-advanced-users)
+7. [Data Privacy](#data-privacy)
 
 
 ## Setup
@@ -47,8 +43,8 @@ In addition to creating a hosted, shareable user interface, the guarded RAG assi
 2. Clone the template repository.
 
    ```bash
-   git clone https://github.com/datarobot-community/guarded-rag-assistant.git
-   cd guarded-rag-assistant
+   git clone https://github.com/datarobot-community/dr-log-analyzer.git
+   cd dr-log-analyzer
    ```
 
 3. Rename the file `.env.template` to `.env` in the root directory of the repo and populate your credentials.
@@ -68,15 +64,13 @@ and `pulumi` invocation see [the advanced setup instructions](#setup-for-advance
 
 ## Architecture overview
 
-![Guarded RAG architecture](https://s3.amazonaws.com/datarobot_public/drx/recipe_gifs/rag_architecture.svg)
+![Log Analyzer architecture](https://s3.amazonaws.com/datarobot_public/drx/recipe_gifs/log_analyzer_architecture.svg)
 
-App templates contain three families of complementary logic. For Guarded RAG you can [opt-in](#make-changes) to fully 
-custom RAG logic and a fully custom frontend or utilize DR's off the shelf offerings:
+App templates contain two families of complementary logic. For Log Analyzer you can [opt-in](#make-changes) to a fully custom frontend or utilize DR's off the shelf offerings:
 
 - **AI logic**: Necessary to service AI requests and produce predictions and completions.
   ```
-  deployment_*/  # Predictive model scoring logic, RAG completion logic (DIY RAG)
-  notebooks/  # Document chunking, VDB creation logic (DIY RAG)
+  deployment_keyword_guard/  # Keyword guard scoring logic
   ```
 - **App Logic**: Necessary for user consumption; whether via a hosted front-end or integrating into an external consumption layer.
   ```
@@ -101,18 +95,6 @@ Each template provides an end-to-end AI architecture, from raw inputs to deploye
 
 ## Make changes
 
-### Change the RAG documents
-
-1. Replace `assets/datarobot_english_documentation_docsassist.zip` with a new zip file containing .pdf, .docx,
-   .md, or .txt documents ([example alternative docs here](https://s3.amazonaws.com/datarobot_public_datasets/ai_accelerators/acme_corp_company_policies_source_business_victoria_templates.zip)).
-3. Update the `rag_documents` setting in `infra/settings_main.py` to specify the local path to the
-   new zip file.
-4. Run `pulumi up` to update your stack.
-   ```bash
-   source set_env.sh  # On windows use `set_env.bat`
-   pulumi up
-   ```
-
 ### Change the LLM
 
 1. Modify the `LLM` setting in `infra/settings_generative.py` by changing `LLM=GlobalLLM.AZURE_OPENAI_GPT_4_O_MINI` to any other LLM from the `GlobalLLM` object. 
@@ -128,52 +110,23 @@ Each template provides an end-to-end AI architecture, from raw inputs to deploye
       pulumi up
       ```
 
-
 > **⚠️ Availability information:**  
 > Using a NIM model requires custom model GPU inference, a premium feature. You will experience errors by using this type of model without the feature enabled. Contact your DataRobot representative or administrator for information on enabling this feature.
-### Change the RAG prompt
-
-1. Modify the `system_prompt` variable in `infra/settings_generative.py` with your desired prompt. 
-2. If using [fully custom RAG logic](#fully-custom-rag-chunking-vectorization-and-retrieval), instead please change the `stuff_prompt` variable in `notebooks/build_rag.ipynb`.
 
 ### Fully custom front-end
 
-1. Edit `infra/settings_main.py` and update `application_type` to `ApplicationType.DIY`
-   - Optionally, update `APP_LOCALE` in `docsassist/i18n.py` to toggle the language.
-     Supported locales are Japanese and English, with English set as the default.
-2. Run `pulumi up` to update your stack with the example custom Streamlit frontend:
+1. Run `pulumi up` to update your stack with the example custom Streamlit frontend:
    ```bash
    source set_env.sh  # On windows use `set_env.bat`
    pulumi up
    ```
-3. After provisioning the stack at least once, you can also edit and test the Streamlit
+2. After provisioning the stack at least once, you can also edit and test the Streamlit
    front-end locally using `streamlit run app.py` from the `frontend/` directory (don't
    forget to initialize your environment using `set_env`).
    ```bash
    source set_env.sh  # On windows use `set_env.bat`
    cd frontend
    streamlit run app.py
-   ```
-   
-
-### Fully custom RAG chunking, vectorization, and retrieval
-1. Install additional requirements (e.g. FAISS, HuggingFace).
-   ```bash
-   source set_env.sh  # On windows use `set_env.bat`
-   pip install -r requirements-extra.txt
-   ```
-2. Edit `infra/settings_main.py` and update `rag_type` to `RAGType.DIY`.
-3. Run `pulumi up` to update your stack with the example custom RAG logic.
-   ```bash
-   source set_env.sh  # On windows use `set_env.bat`
-   pulumi up
-   ```
-4. Edit `notebooks/build_rag.ipynb` to customize the doc chunking, vectorization logic.
-5. Edit `deployment_diy_rag/custom.py` to customize the retrieval logic & LLM call.
-6. Run `pulumi up` to update your stack.
-   ```bash
-   source set_env.sh  # On windows use `set_env.bat`
-   pulumi up
    ```
 ## Share results
 

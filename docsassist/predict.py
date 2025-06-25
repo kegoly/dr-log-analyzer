@@ -25,7 +25,7 @@ from docsassist.deployments import LLMDeployment
 logger = logging.getLogger(__name__)
 
 
-def get_rag_completion(question: str, messages: list[ChatCompletionMessageParam]) -> dict:
+def get_llm_completion(question: str, messages: list[ChatCompletionMessageParam]) -> dict:
     """
     Send a prompt to the DataRobot Chat API and return the response
     

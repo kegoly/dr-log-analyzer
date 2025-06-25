@@ -35,8 +35,8 @@ from .settings_main import (
 CHAT_MODEL_NAME = os.getenv("CHAT_MODEL_NAME")
 
 custom_model_args = CustomModelArgs(
-    name=f"Guarded RAG Proxy LLM Custom Model [{project_name}]",
-    resource_name=f"Guarded RAG Proxy LLM Custom Model [{project_name}]",
+    name=f"Log Analyzer Proxy LLM Custom Model [{project_name}]",
+    resource_name=f"Log Analyzer Proxy LLM Custom Model [{project_name}]",
     base_environment_id=runtime_environment_moderations.id,
     target_name=TARGET_COLUMN_NAME,
     target_type=dr.enums.TARGET_TYPE.TEXT_GENERATION,
@@ -44,13 +44,13 @@ custom_model_args = CustomModelArgs(
 )
 
 registered_model_args = RegisteredModelArgs(
-    resource_name=f"Guarded RAG Proxy LLM Registered Model [{project_name}]",
+    resource_name=f"Log Analyzer Proxy LLM Registered Model [{project_name}]",
 )
 
 
 deployment_args = DeploymentArgs(
-    resource_name=f"Guarded RAG Proxy LLM Deployment [{project_name}]",
-    label=f"Guarded RAG Proxy LLM Deployment [{project_name}]",
+    resource_name=f"Log Analyzer Proxy LLM Deployment [{project_name}]",
+    label=f"Log Analyzer Proxy LLM Deployment [{project_name}]",
     association_id_settings=datarobot.DeploymentAssociationIdSettingsArgs(
         column_names=["association_id"],
         auto_generate_id=False,

@@ -169,10 +169,6 @@ cython_debug/
 tests/output/
 .env*
 !.env.template
-deployment_diy_rag/faiss_db/
-deployment_diy_rag/sentencetransformers/
-deployment_diy_rag/rag_settings.yaml
-deployment_diy_rag/model-metadata.yaml
 Pulumi.*.yaml
 
 

@@ -229,7 +229,7 @@ def main() -> None:
         
         render_message(chat_container, full_message, True)
         with st.spinner(gettext("Getting AI response...")):
-            response = predict.get_rag_completion(
+            response = predict.get_llm_completion(
                 question=full_message,
                 messages=st.session_state.messages,
             )

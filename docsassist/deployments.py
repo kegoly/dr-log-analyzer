@@ -84,23 +84,14 @@ class DynamicSettings(BaseSettings):
         )
 
 
-rag_deployment_env_name: str = "LLM_DEPLOYMENT_ID"
+llm_deployment_env_name: str = "LLM_DEPLOYMENT_ID"
 app_env_name: str = "DATAROBOT_APPLICATION_ID"
 
 
 class LLMDeployment(DynamicSettings):
     id: str = Field(
         validation_alias=AliasChoices(
-            "MLOPS_RUNTIME_PARAM_" + rag_deployment_env_name,
-            rag_deployment_env_name,
-        )
-    )
-
-
-class RAGDeployment(DynamicSettings):
-    id: str = Field(
-        validation_alias=AliasChoices(
-            "MLOPS_RUNTIME_PARAM_" + rag_deployment_env_name,
-            rag_deployment_env_name,
+            "MLOPS_RUNTIME_PARAM_" + llm_deployment_env_name,
+            llm_deployment_env_name,
         )
     )

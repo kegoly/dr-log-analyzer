@@ -34,11 +34,11 @@ runtime_environment_moderations = GlobalRuntimeEnvironment.PYTHON_312_MODERATION
 default_prediction_server_id: Optional[str] = None
 
 prediction_environment_args = PredictionEnvironmentArgs(
-    resource_name=f"Guarded RAG Prediction Environment [{project_name}]",
+    resource_name=f"Log Analyzer Prediction Environment [{project_name}]",
     platform=PredictionEnvironmentPlatforms.DATAROBOT_SERVERLESS,
 ).model_dump(mode="json", exclude_none=True)
 
 use_case_args = UseCaseArgs(
-    resource_name=f"Guarded RAG Use Case [{project_name}]",
-    description="Use case for Guarded RAG Assistant application",
+    resource_name=f"Log Analyzer Use Case [{project_name}]",
+    description="Use case for Log Analyzer Assistant application",
 ).model_dump(exclude_none=True)

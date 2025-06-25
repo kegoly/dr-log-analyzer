@@ -31,7 +31,7 @@ app_source_args = ApplicationSourceArgs(
     base_environment_id=GlobalRuntimeEnvironment.PYTHON_312_APPLICATION_BASE.value.id,
 ).model_dump(mode="json", exclude_none=True)
 
-app_resource_name: str = f"Guarded RAG Application [{project_name}]"
+app_resource_name: str = f"Log Analyzer Application [{project_name}]"
 
 
 def ensure_app_settings(app_id: str) -> None:

@@ -113,17 +113,17 @@ def get_credential_runtime_parameter_values(
         if "credential" in rtp_dict["type"]:
             if rtp_dict["type"] == "credential":
                 dr_credential = datarobot.ApiTokenCredential(
-                    resource_name=f"Guarded RAG {rtp_dict['key']} Credential [{project_name}]",
+                    resource_name=f"Log Analyzer {rtp_dict['key']} Credential [{project_name}]",
                     api_token=rtp_dict["value"],
                 )
             elif rtp_dict["type"] == "google_credential":
                 dr_credential = datarobot.GoogleCloudCredential(
-                    resource_name=f"Guarded RAG {rtp_dict['key']} Credential [{project_name}]",
+                    resource_name=f"Log Analyzer {rtp_dict['key']} Credential [{project_name}]",
                     gcp_key=rtp_dict["value"].get("gcpKey"),
                 )
             elif rtp_dict["type"] == "aws_credential":
                 dr_credential = datarobot.AwsCredential(
-                    resource_name=f"Guarded RAG {rtp_dict['key']} Credential [{project_name}]",
+                    resource_name=f"Log Analyzer {rtp_dict['key']} Credential [{project_name}]",
                     aws_access_key_id=rtp_dict["value"]["awsAccessKeyId"],
                     aws_secret_access_key=rtp_dict["value"]["awsSecretAccessKey"],
                     aws_session_token=rtp_dict["value"].get("awsSessionToken"),
